@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 消息中间件概述
 ## 中间件介绍
 ###什么是中间件？
@@ -66,3 +67,6 @@ Java消息服务（Java Message Service）即JMS，是一个Java平台中关于�
 #### JMS编码接口之间的关系
 ![](https://upload-images.jianshu.io/upload_images/14481291-f116a19b98206435.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 ## windows下
+=======
+
+>>>>>>> 05bf4d243e6926aae73a511da3e953839d7146ba
