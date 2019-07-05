@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 消息中间件概述
 ## 中间件介绍
 ###什么是中间件？
@@ -66,7 +65,226 @@ Java消息服务（Java Message Service）即JMS，是一个Java平台中关于�
 * MessageProducer：“生产者”,消费者和生产者间传送的对象，消息头，一组消息属性，一个消息体
 #### JMS编码接口之间的关系
 ![](https://upload-images.jianshu.io/upload_images/14481291-f116a19b98206435.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-## windows下
-=======
+## windows下安装ActiveMQ
+## Linux下安装ActiveMQ
+## 队列模式的消息演示
+`pom.xml`
+```
+    <dependencies>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+			<version>5.13.0</version>
+		</dependency>
+	</dependencies>
+```
+`ActiveMqProducer.java`
+```
+package com.cxy.jms.queue;
 
->>>>>>> 05bf4d243e6926aae73a511da3e953839d7146ba
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+import javax.jms.*;
+
+/**
+ * @Auther: cxy
+ * @Date: 2019/7/4
+ * @Description: 生产者
+ */
+public class ActiveMqProducer {
+    private static final String url = "tcp://192:168.31.10:61616";
+    private static final String queueName = "queue-test";
+
+    public static void main(String[] args) throws JMSException {
+        //1.创建ConnectionFactory
+        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+
+        //2.创建Connection
+        Connection connection = connectionFactory.createConnection();
+
+        //3.启动连接
+        connection.start();
+
+        //4.创建会话
+        Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+
+        //5.创建一个目标
+        Destination destination = session.createQueue(queueName);
+
+        //6.创建一个生产者
+        MessageProducer producer = session.createProducer(destination);
+
+        for(int i=0;i<100;i++){
+            //7.创建消息
+            TextMessage textMessage = session.createTextMessage("test" + i);
+
+            //8.发布消息
+            producer.send(textMessage);
+
+            System.out.println("发送消息："+textMessage.getText());
+        }
+
+        //9.关闭连接
+        connection.close();
+    }
+}
+```
+`ActiveMqConsumer.java`
+```
+package com.cxy.jms.queue;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+import javax.jms.*;
+
+/**
+ * @Auther: cxy
+ * @Date: 2019/7/4
+ * @Description: 消费者
+ */
+public class ActiveMqConsumer {
+    private static final String url = "tcp://192:168.31.10:61616";
+    private static final String queueName = "queue-test";
+
+    public static void main(String[] args) throws JMSException {
+        //1.创建ConnectionFactory
+        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+
+        //2.创建Connection
+        Connection connection = connectionFactory.createConnection();
+
+        //3.启动连接
+        connection.start();
+
+        //4.创建会话
+        Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+
+        //5.创建一个目标
+        Destination destination = session.createQueue(queueName);
+
+        //6.创建消费者
+        MessageConsumer consumer = session.createConsumer(destination);
+
+        //7.创建一个监听器
+        consumer.setMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(Message message) {
+                TextMessage textMessage = (TextMessage) message;
+                try {
+                    System.out.println("接收消息："+textMessage.getText());
+                }catch (JMSException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+}
+```
+## 主题模式的消息演示
+`ActiveMqProducer.java`
+```
+package com.cxy.jms.topic;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+import javax.jms.*;
+
+/**
+ * @Auther: cxy
+ * @Date: 2019/7/4
+ * @Description: 生产者
+ */
+public class ActiveMqProducer {
+    private static final String url = "tcp://192:168.31.10:61616";
+    private static final String topicName = "topic-test";
+
+    public static void main(String[] args) throws JMSException {
+        //1.创建ConnectionFactory
+        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+
+        //2.创建Connection
+        Connection connection = connectionFactory.createConnection();
+
+        //3.启动连接
+        connection.start();
+
+        //4.创建会话
+        Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+
+        //5.创建一个目标
+        Destination destination = session.createTopic(topicName);
+
+        //6.创建一个生产者
+        MessageProducer producer = session.createProducer(destination);
+
+        for(int i=0;i<100;i++){
+            //7.创建消息
+            TextMessage textMessage = session.createTextMessage("test" + i);
+
+            //8.发布消息
+            producer.send(textMessage);
+
+            System.out.println("发送消息："+textMessage.getText());
+        }
+
+        //9.关闭连接
+        connection.close();
+    }
+}
+```
+`ActiveMqConsumer.java`
+```
+package com.cxy.jms.topic;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+import javax.jms.*;
+
+/**
+ * @Auther: cxy
+ * @Date: 2019/7/4
+ * @Description: 消费者
+ */
+public class ActiveMqConsumer {
+    private static final String url = "tcp://192:168.31.10:61616";
+    private static final String topicName = "topic-test";
+
+    public static void main(String[] args) throws JMSException {
+        //1.创建ConnectionFactory
+        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+
+        //2.创建Connection
+        Connection connection = connectionFactory.createConnection();
+
+        //3.启动连接
+        connection.start();
+
+        //4.创建会话
+        Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+
+        //5.创建一个目标
+        Destination destination = session.createTopic(topicName);
+
+        //6.创建消费者
+        MessageConsumer consumer = session.createConsumer(destination);
+
+        //7.创建一个监听器
+        consumer.setMessageListener(new MessageListener() {
+            @Override
+            public void onMessage(Message message) {
+                TextMessage textMessage = (TextMessage) message;
+                try {
+                    System.out.println("接收消息："+textMessage.getText());
+                }catch (JMSException e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
+}
+```
+#### activemq模式区分
+队列模式：生产者发送消息，所有消费者对消息进行平分，已消费的消息不能重新消费
+主题模式：生产者发送消息，所有已订阅主题的消费者都能收到消息。
